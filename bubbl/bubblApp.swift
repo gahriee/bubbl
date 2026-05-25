@@ -6,12 +6,22 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 @main
 struct bubblApp: App {
+    @StateObject private var appState: AppState
+
+    init() {
+        FirebaseApp.configure()
+        let container = DIContainer()
+        _appState = StateObject(wrappedValue: AppState(container: container))
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(appState)
         }
     }
 }

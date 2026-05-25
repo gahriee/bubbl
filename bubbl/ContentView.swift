@@ -2,23 +2,7 @@
 //  ContentView.swift
 //  bubbl
 //
-//  Created by Eli on 5/26/26.
+//  Note: This file is no longer used.
+//  The application entry point is bubblApp.swift, which boots RootView.swift as the Auth Gate.
+//  You can safely delete this file from the project.
 //
-
-import SwiftUI
-
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
-
-#Preview {
-    ContentView()
-}
