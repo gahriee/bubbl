@@ -63,4 +63,16 @@ final class AuthRepository: AuthRepositoryProtocol {
         
         try await db.collection(Constants.users).document(user.uid).updateData(["displayName": name])
     }
+
+    func searchUsers(query: String) async throws -> [BubblUser] {
+        guard !query.isEmpty else { return [] }
+        // Simple prefix search on email
+        let snapshot = try await db.collection(Constants.users)
+            .whereField("email", isGreaterThanOrEqualTo: query.lowercased())
+            .whereField("email", isLessThanOrEqualTo: query.lowercased() + "\u{f8ff}")
+            .limit(to: 10)
+            .getDocuments()
+        
+        return snapshot.documents.compactMap { BubblUser(document: $0.data(), id: $0.documentID) }
+    }
 }

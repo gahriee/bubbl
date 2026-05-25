@@ -6,72 +6,128 @@ struct ProfileView: View {
 
     var body: some View {
         NavigationView {
-            Form {
-                Section {
-                    HStack {
-                        Spacer()
-                        Circle()
-                            .fill(Color.accentColor.opacity(0.2))
-                            .frame(width: 80, height: 80)
-                            .overlay(
+            ZStack {
+                Color(UIColor.systemGroupedBackground)
+                    .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 32) {
+                        // Avatar Section
+                        VStack(spacing: 16) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [.blue.opacity(0.8), .purple.opacity(0.8)]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 100, height: 100)
+                                    .shadow(color: .purple.opacity(0.3), radius: 10, x: 0, y: 5)
+                                
                                 Text(String(vm.displayName.prefix(1)).uppercased())
-                                    .font(.largeTitle)
-                                    .foregroundColor(.accentColor)
-                            )
-                        Spacer()
-                    }
-                    .padding(.vertical)
-                }
-                .listRowBackground(Color.clear)
-
-                Section(header: Text("Profile Information")) {
-                    if let email = appState.currentUser?.email {
-                        HStack {
-                            Text("Email")
-                            Spacer()
-                            Text(email)
-                                .foregroundColor(.secondary)
+                                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                            }
+                            
+                            VStack(spacing: 4) {
+                                Text(vm.displayName.isEmpty ? "User" : vm.displayName)
+                                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                                
+                                if let email = appState.currentUser?.email {
+                                    Text(email)
+                                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                            }
                         }
-                    }
-                    
-                    TextField("Display Name", text: $vm.displayName)
-                        .disableAutocorrection(true)
-                }
+                        .padding(.top, 24)
 
-                if let error = vm.errorMessage {
-                    Section {
-                        Text(error)
+                        // Editable Info Section
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Profile Information")
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundColor(.secondary)
+                                .padding(.leading, 8)
+                            
+                            VStack(spacing: 0) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "person.fill")
+                                        .foregroundColor(.secondary)
+                                        .frame(width: 24)
+                                    
+                                    TextField("Display Name", text: $vm.displayName)
+                                        .font(.system(size: 17, weight: .regular, design: .rounded))
+                                        .disableAutocorrection(true)
+                                }
+                                .padding()
+                            }
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
+                        }
+
+                        if let error = vm.errorMessage {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                Text(error)
+                            }
                             .foregroundColor(.red)
                             .font(.footnote)
-                    }
-                }
+                            .padding(.horizontal)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .transition(.opacity)
+                        }
 
-                Section {
-                    Button(action: {
-                        Task { await vm.saveChanges() }
-                    }) {
-                        if vm.isLoading {
-                            ProgressView()
+                        // Action Buttons
+                        VStack(spacing: 16) {
+                            Button(action: {
+                                Task { await vm.saveChanges() }
+                            }) {
+                                HStack {
+                                    if vm.isLoading {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    } else {
+                                        Text("Save Changes")
+                                            .font(.headline)
+                                    }
+                                }
+                                .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
-                        } else {
-                            Text("Save Changes")
-                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(
+                                    LinearGradient(
+                                        colors: [.blue, .purple],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                            }
+                            .disabled(vm.isLoading || vm.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                            .opacity(vm.isLoading || vm.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.6 : 1.0)
+                            
+                            Button(action: {
+                                vm.signOut()
+                            }) {
+                                Text("Sign Out")
+                                    .font(.headline)
+                                    .foregroundColor(.red)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(Color.red.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            }
                         }
                     }
-                    .disabled(vm.isLoading || vm.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-
-                Section {
-                    Button(action: {
-                        vm.signOut()
-                    }) {
-                        Text("Sign Out")
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity)
-                    }
+                    .padding(24)
                 }
             }
             .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 vm.loadUser(from: appState)
             }

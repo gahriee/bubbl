@@ -7,20 +7,45 @@ struct ConversationListView: View {
 
     var body: some View {
         NavigationView {
-            List(vm.conversations) { conversation in
-                if let currentUser = appState.currentUser {
-                    NavigationLink(destination: ChatView(conversation: conversation, currentUser: currentUser)) {
-                        ConversationRowView(conversation: conversation, currentUserID: currentUser.id)
+            ZStack {
+                Color(UIColor.systemGroupedBackground)
+                    .ignoresSafeArea()
+
+                List(vm.conversations) { conversation in
+                    if let currentUser = appState.currentUser {
+                        ZStack {
+                            NavigationLink(destination: ChatView(conversation: conversation, currentUser: currentUser)) {
+                                EmptyView()
+                            }
+                            .opacity(0)
+                            
+                            ConversationRowView(conversation: conversation, currentUserID: currentUser.id)
+                                .padding(.all, 12)
+                                .background(Color(UIColor.secondarySystemGroupedBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
+                        }
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    }
+                }
+                .listStyle(PlainListStyle())
+            }
+            .navigationTitle("Messages")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showNewConversation = true
+                    }) {
+                        Image(systemName: "square.and.pencil.circle.fill")
+                            .resizable()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.accentColor)
+                            .shadow(color: .accentColor.opacity(0.3), radius: 3, x: 0, y: 2)
                     }
                 }
             }
-            .listStyle(PlainListStyle())
-            .navigationTitle("Messages")
-            .navigationBarItems(trailing: Button(action: {
-                showNewConversation = true
-            }) {
-                Image(systemName: "square.and.pencil")
-            })
             .sheet(isPresented: $showNewConversation) {
                 NewConversationView(vm: vm) { conversation in
                     // Automatically navigate to this conversation if needed in future

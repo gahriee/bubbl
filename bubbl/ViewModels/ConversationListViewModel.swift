@@ -4,6 +4,7 @@ import FirebaseFirestore
 @MainActor
 final class ConversationListViewModel: ObservableObject {
     @Published var conversations: [Conversation] = []
+    @Published var searchResults: [BubblUser] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -51,6 +52,22 @@ final class ConversationListViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
             return nil
+        }
+    }
+
+    func searchUsers(query: String) async {
+        guard !query.isEmpty else {
+            searchResults = []
+            return
+        }
+        
+        do {
+            let results = try await authRepo.searchUsers(query: query)
+            let me = authRepo.currentUser?.id ?? ""
+            searchResults = results.filter { $0.id != me }
+        } catch {
+            print("Search failed: \(error)")
+            searchResults = []
         }
     }
 }

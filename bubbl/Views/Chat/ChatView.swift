@@ -14,31 +14,38 @@ struct ChatView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(vm.messages) { message in
-                            MessageBubble(
-                                message:   message,
-                                isFromMe:  message.senderID == vm.currentUser.id
-                            )
-                            .id(message.id)
+        ZStack {
+            // Background
+            Color(UIColor.systemGroupedBackground)
+                .ignoresSafeArea()
+                
+            VStack(spacing: 0) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(vm.messages) { message in
+                                MessageBubble(
+                                    message:   message,
+                                    isFromMe:  message.senderID == vm.currentUser.id
+                                )
+                                .id(message.id)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                    }
+                    .onChange(of: vm.messages.count) { _ in
+                        if let last = vm.messages.last {
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                proxy.scrollTo(last.id, anchor: .bottom)
+                            }
                         }
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
                 }
-                .onChange(of: vm.messages.count) { _ in
-                    if let last = vm.messages.last {
-                        withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
-                    }
-                }
-            }
 
-            Divider()
-            ChatInputBar(text: $vm.inputText, isSending: vm.isSending) {
-                Task { await vm.send() }
+                ChatInputBar(text: $vm.inputText, isSending: vm.isSending) {
+                    Task { await vm.send() }
+                }
             }
         }
         .navigationTitle(vm.conversation.participantNames.values.first ?? "Chat")

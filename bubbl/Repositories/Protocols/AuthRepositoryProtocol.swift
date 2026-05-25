@@ -8,4 +8,5 @@ protocol AuthRepositoryProtocol {
     func observeAuthState(onChange: @escaping (BubblUser?) -> Void)
     func findUser(byEmail email: String) async throws -> BubblUser?
     func updateDisplayName(_ name: String) async throws
+    func searchUsers(query: String) async throws -> [BubblUser]
 }
