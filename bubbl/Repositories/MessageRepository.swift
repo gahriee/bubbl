@@ -43,6 +43,17 @@ final class MessageRepository: MessageRepositoryProtocol {
             ])
     }
 
+    func unsendMessage(messageID: String, in conversationID: String) async throws {
+        try await db.collection(Constants.conversations)
+            .document(conversationID)
+            .collection(Constants.messages)
+            .document(messageID)
+            .updateData([
+                "text": "Unsent a message",
+                "isUnsent": true
+            ])
+    }
+
     func markAsRead(messageID: String, in conversationID: String) async throws {
         try await db.collection(Constants.conversations)
             .document(conversationID)

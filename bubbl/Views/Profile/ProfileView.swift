@@ -83,7 +83,7 @@ struct ProfileView: View {
                         // Action Buttons
                         VStack(spacing: 16) {
                             Button(action: {
-                                Task { await vm.saveChanges() }
+                                Task { await vm.saveChanges(appState: appState) }
                             }) {
                                 HStack {
                                     if vm.isLoading {
@@ -131,6 +131,27 @@ struct ProfileView: View {
             .onAppear {
                 vm.loadUser(from: appState)
             }
+            .overlay(
+                VStack {
+                    if vm.showSuccessToast {
+                        HStack(spacing: 12) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text("Profile updated successfully")
+                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(Color(UIColor.secondarySystemGroupedBackground))
+                        .clipShape(Capsule())
+                        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    Spacer()
+                }
+                .padding(.top, 16)
+                .animation(.spring(response: 0.4, dampingFraction: 0.7), value: vm.showSuccessToast)
+            )
         }
     }
 }

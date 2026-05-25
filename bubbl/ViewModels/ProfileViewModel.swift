@@ -5,6 +5,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var displayName = ""
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var showSuccessToast = false
 
     private let authRepo: AuthRepositoryProtocol
 
@@ -18,7 +19,7 @@ final class ProfileViewModel: ObservableObject {
         }
     }
 
-    func saveChanges() async {
+    func saveChanges(appState: AppState) async {
         let name = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }
 
@@ -27,6 +28,16 @@ final class ProfileViewModel: ObservableObject {
 
         do {
             try await authRepo.updateDisplayName(name)
+            
+            appState.currentUser?.displayName = name
+            showSuccessToast = true
+            
+            Task {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                await MainActor.run {
+                    self.showSuccessToast = false
+                }
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

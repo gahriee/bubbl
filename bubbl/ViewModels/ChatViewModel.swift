@@ -85,4 +85,14 @@ final class ChatViewModel: ObservableObject {
         editingMessage = nil
         inputText = ""
     }
+    
+    func unsend(_ message: Message) {
+        Task {
+            do {
+                try await messageRepo.unsendMessage(messageID: message.id, in: conversation.id)
+            } catch {
+                print("Failed to unsend message: \(error)")
+            }
+        }
+    }
 }

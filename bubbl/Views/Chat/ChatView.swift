@@ -30,11 +30,17 @@ struct ChatView: View {
                                 )
                                 .id(message.id)
                                 .contextMenu {
-                                    if message.senderID == vm.currentUser.id {
+                                    if message.senderID == vm.currentUser.id && !message.isUnsent {
                                         Button(action: {
                                             vm.startEditing(message)
                                         }) {
                                             Label("Edit", systemImage: "pencil")
+                                        }
+                                        
+                                        Button(role: .destructive, action: {
+                                            vm.unsend(message)
+                                        }) {
+                                            Label("Unsend", systemImage: "trash")
                                         }
                                     }
                                 }
