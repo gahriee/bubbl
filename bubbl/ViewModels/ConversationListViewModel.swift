@@ -70,4 +70,17 @@ final class ConversationListViewModel: ObservableObject {
             searchResults = []
         }
     }
+
+    func deleteConversation(at offsets: IndexSet) {
+        let conversationsToDelete = offsets.map { conversations[$0] }
+        for conversation in conversationsToDelete {
+            Task {
+                do {
+                    try await conversationRepo.deleteConversation(conversation.id)
+                } catch {
+                    errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
 }

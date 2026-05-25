@@ -47,4 +47,8 @@ final class ConversationRepository: ConversationRepositoryProtocol {
             "lastMessageDate": Timestamp(date: date)
         ])
     }
+
+    func deleteConversation(_ conversationID: String) async throws {
+        try await db.collection(Constants.conversations).document(conversationID).delete()
+    }
 }
