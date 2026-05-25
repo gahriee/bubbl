@@ -22,7 +22,7 @@ struct ConversationListView: View {
                             .fontWeight(.semibold)
                             .foregroundColor(.primary)
                         
-                        Text("Tap the new chat icon above to start talking with your friends.")
+                        Text("Tap the new chat icon below to start talking with your friends.")
                             .multilineTextAlignment(.center)
                             .foregroundColor(.secondary)
                             .padding(.horizontal, 40)
@@ -52,21 +52,34 @@ struct ConversationListView: View {
                     }
                     .listStyle(PlainListStyle())
                 }
-            }
-            .navigationTitle("Messages")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showNewConversation = true
-                    }) {
-                        Image(systemName: "square.and.pencil.circle.fill")
-                            .resizable()
-                            .frame(width: 30, height: 30)
-                            .foregroundColor(.accentColor)
-                            .shadow(color: .accentColor.opacity(0.3), radius: 3, x: 0, y: 2)
+                
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            showNewConversation = true
+                        }) {
+                            Image(systemName: "square.and.pencil")
+                                .font(.system(size: 24, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 60, height: 60)
+                                .background(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [.blue.opacity(0.9), .purple.opacity(0.9)]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .clipShape(Circle())
+                                .shadow(color: .purple.opacity(0.3), radius: 6, x: 0, y: 4)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 20)
                     }
                 }
             }
+            .navigationTitle("Messages")
             .sheet(isPresented: $showNewConversation) {
                 NewConversationView(vm: vm) { conversation in
                     // Automatically navigate to this conversation if needed in future

@@ -47,6 +47,15 @@ final class ChatViewModel: ObservableObject {
         if let editingMessage = editingMessage {
             do {
                 try await messageRepo.editMessage(messageID: editingMessage.id, newText: text, in: conversation.id)
+                
+                if let lastMsg = messages.last, lastMsg.id == editingMessage.id {
+                    try await conversationRepo.updateLastMessage(
+                        conversationID: conversation.id,
+                        text: text,
+                        date: lastMsg.date
+                    )
+                }
+                
                 self.editingMessage = nil
             } catch {
                 inputText = text
@@ -90,6 +99,14 @@ final class ChatViewModel: ObservableObject {
         Task {
             do {
                 try await messageRepo.unsendMessage(messageID: message.id, in: conversation.id)
+                
+                if let lastMsg = messages.last, lastMsg.id == message.id {
+                    try await conversationRepo.updateLastMessage(
+                        conversationID: conversation.id,
+                        text: "Unsent a message",
+                        date: lastMsg.date
+                    )
+                }
             } catch {
                 print("Failed to unsend message: \(error)")
             }
