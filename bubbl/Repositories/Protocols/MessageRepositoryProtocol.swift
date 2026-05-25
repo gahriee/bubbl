@@ -8,5 +8,6 @@ protocol MessageRepositoryProtocol {
     ) -> ListenerRegistration
 
     func send(message: Message) async throws
+    func editMessage(messageID: String, newText: String, in conversationID: String) async throws
     func markAsRead(messageID: String, in conversationID: String) async throws
 }

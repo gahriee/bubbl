@@ -29,10 +29,18 @@ struct MessageBubble: View {
                     .clipShape(ChatBubbleShape(isFromMe: isFromMe))
                     .shadow(color: isFromMe ? .purple.opacity(0.25) : .black.opacity(0.05), radius: 5, x: 0, y: 2)
                 
-                Text(message.date, style: .time)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 4)
+                HStack(spacing: 4) {
+                    Text(message.date, style: .time)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.secondary)
+                        
+                    if message.isEdited {
+                        Text("(Edited)")
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.horizontal, 4)
             }
             if !isFromMe { Spacer(minLength: 50) }
         }

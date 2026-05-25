@@ -29,6 +29,15 @@ struct ChatView: View {
                                     isFromMe:  message.senderID == vm.currentUser.id
                                 )
                                 .id(message.id)
+                                .contextMenu {
+                                    if message.senderID == vm.currentUser.id {
+                                        Button(action: {
+                                            vm.startEditing(message)
+                                        }) {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
+                                    }
+                                }
                             }
                         }
                         .padding(.horizontal, 16)
@@ -43,7 +52,12 @@ struct ChatView: View {
                     }
                 }
 
-                ChatInputBar(text: $vm.inputText, isSending: vm.isSending) {
+                ChatInputBar(
+                    text: $vm.inputText,
+                    isSending: vm.isSending,
+                    editingMessage: vm.editingMessage,
+                    onCancelEdit: { vm.cancelEditing() }
+                ) {
                     Task { await vm.send() }
                 }
             }

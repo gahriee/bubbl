@@ -3,11 +3,30 @@ import SwiftUI
 struct ChatInputBar: View {
     @Binding var text: String
     var isSending: Bool
+    var editingMessage: Message?
+    var onCancelEdit: (() -> Void)?
     var onSend: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            HStack {
+        VStack(spacing: 0) {
+            if editingMessage != nil {
+                HStack {
+                    Text("Editing Message")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundColor(.accentColor)
+                    Spacer()
+                    Button(action: { onCancelEdit?() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 8)
+                .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.8))
+            }
+            
+            HStack(spacing: 12) {
+                HStack {
                 TextField("Type a message...", text: $text)
                     .font(.system(size: 16, design: .rounded))
                     .padding(.horizontal, 16)

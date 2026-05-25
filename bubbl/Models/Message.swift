@@ -9,6 +9,7 @@ struct Message: Identifiable, Equatable {
     let text: String
     let date: Date
     var isRead: Bool
+    var isEdited: Bool
 
     init(
         id: String,
@@ -17,7 +18,8 @@ struct Message: Identifiable, Equatable {
         senderName: String,
         text: String,
         date: Date,
-        isRead: Bool
+        isRead: Bool,
+        isEdited: Bool = false
     ) {
         self.id             = id
         self.conversationID = conversationID
@@ -26,6 +28,7 @@ struct Message: Identifiable, Equatable {
         self.text           = text
         self.date           = date
         self.isRead         = isRead
+        self.isEdited       = isEdited
     }
 
     init?(document: [String: Any], id: String) {
@@ -43,6 +46,7 @@ struct Message: Identifiable, Equatable {
         self.text           = text
         self.date           = timestamp.dateValue()
         self.isRead         = document["isRead"] as? Bool ?? false
+        self.isEdited       = document["isEdited"] as? Bool ?? false
     }
 
     var toMap: [String: Any] {
@@ -52,7 +56,8 @@ struct Message: Identifiable, Equatable {
             "senderName":     senderName,
             "text":           text,
             "date":           Timestamp(date: date),
-            "isRead":         isRead
+            "isRead":         isRead,
+            "isEdited":       isEdited
         ]
     }
 }

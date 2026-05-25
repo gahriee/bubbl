@@ -32,6 +32,17 @@ final class MessageRepository: MessageRepositoryProtocol {
             .setData(message.toMap)
     }
 
+    func editMessage(messageID: String, newText: String, in conversationID: String) async throws {
+        try await db.collection(Constants.conversations)
+            .document(conversationID)
+            .collection(Constants.messages)
+            .document(messageID)
+            .updateData([
+                "text": newText,
+                "isEdited": true
+            ])
+    }
+
     func markAsRead(messageID: String, in conversationID: String) async throws {
         try await db.collection(Constants.conversations)
             .document(conversationID)

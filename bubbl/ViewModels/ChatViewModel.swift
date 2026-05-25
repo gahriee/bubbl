@@ -6,6 +6,7 @@ final class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = []
     @Published var inputText = ""
     @Published var isSending = false
+    @Published var editingMessage: Message?
 
     private let messageRepo: MessageRepositoryProtocol
     private let conversationRepo: ConversationRepositoryProtocol
@@ -43,25 +44,45 @@ final class ChatViewModel: ObservableObject {
         isSending = true
         defer { isSending = false }
 
-        let message = Message(
-            id:             UUID().uuidString,
-            conversationID: conversation.id,
-            senderID:       currentUser.id,
-            senderName:     currentUser.displayName,
-            text:           text,
-            date:           Date(),
-            isRead:         false
-        )
-        do {
-            try await messageRepo.send(message: message)
-            try await conversationRepo.updateLastMessage(
+        if let editingMessage = editingMessage {
+            do {
+                try await messageRepo.editMessage(messageID: editingMessage.id, newText: text, in: conversation.id)
+                self.editingMessage = nil
+            } catch {
+                inputText = text
+            }
+        } else {
+            let message = Message(
+                id:             UUID().uuidString,
                 conversationID: conversation.id,
-                text: text,
-                date: message.date
+                senderID:       currentUser.id,
+                senderName:     currentUser.displayName,
+                text:           text,
+                date:           Date(),
+                isRead:         false,
+                isEdited:       false
             )
-        } catch {
-            // Re-add text to input on failure
-            inputText = text
+            do {
+                try await messageRepo.send(message: message)
+                try await conversationRepo.updateLastMessage(
+                    conversationID: conversation.id,
+                    text: text,
+                    date: message.date
+                )
+            } catch {
+                // Re-add text to input on failure
+                inputText = text
+            }
         }
+    }
+
+    func startEditing(_ message: Message) {
+        editingMessage = message
+        inputText = message.text
+    }
+    
+    func cancelEditing() {
+        editingMessage = nil
+        inputText = ""
     }
 }
