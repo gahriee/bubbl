@@ -6,7 +6,7 @@ struct ConversationRowView: View {
 
     var otherParticipantName: String {
         let otherIDs = conversation.participantIDs.filter { $0 != currentUserID }
-        if let first = otherIDs.first, let name = conversation.participantNames[first] {
+        if let first = otherIDs.first, let name = conversation.participantNames[first], !name.trimmingCharacters(in: .whitespaces).isEmpty {
             return name
         }
         return "Unknown User"

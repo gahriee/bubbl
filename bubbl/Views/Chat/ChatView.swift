@@ -68,7 +68,8 @@ struct ChatView: View {
                 }
             }
         }
-        .navigationTitle(vm.conversation.participantNames.values.first ?? "Chat")
+        .navigationTitle(vm.conversation.participantNames.filter { $0.key != vm.currentUser.id }
+                            .values.first(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }) ?? "Chat")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear  { vm.startObserving() }
         .onDisappear { vm.stopObserving() }
